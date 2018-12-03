@@ -15,8 +15,19 @@
  */
 package org.greenrobot.eventbus;
 
+/**
+ * 订阅信息类，其中封装了Subscriber和SubscriberMethod，
+ * 其作用就是将Subscriber和SubscriberMethod绑定在一起。
+ */
 final class Subscription {
+    /**
+     * 订阅者对象，如MainActivity
+     */
     final Object subscriber;
+
+    /**
+     * 订阅者的一个订阅方法，如在MainActivity中声明的被@Subscribe标注的订阅方法
+     */
     final SubscriberMethod subscriberMethod;
     /**
      * Becomes false as soon as {@link EventBus#unregister(Object)} is called, which is checked by queued event delivery

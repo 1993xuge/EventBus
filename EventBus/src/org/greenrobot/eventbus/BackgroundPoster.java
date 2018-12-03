@@ -19,7 +19,10 @@ import java.util.logging.Level;
 
 /**
  * Posts events in background.
+ * 同时实现了Runnable接口和Poster接口，与ThreadMode.BACKGROUND相对应。
  *
+ * 它的作用是通过enquque()函数，将事件保存到PendingPostQueue队列中，
+ * 并使用线程池执行当前任务，在run()函数中，依次从队列中取出事件，并处理。
  * @author Markus
  */
 final class BackgroundPoster implements Runnable, Poster {
@@ -35,9 +38,11 @@ final class BackgroundPoster implements Runnable, Poster {
     }
 
     public void enqueue(Subscription subscription, Object event) {
+        // 将参数Subscription对象和事件封装成PendingPost，并添加到事件队列中。
         PendingPost pendingPost = PendingPost.obtainPendingPost(subscription, event);
         synchronized (this) {
             queue.enqueue(pendingPost);
+            // 如果executorRunning = false，即BackgroundPoster处于“闲置”状态，则开启线程池，处理当前Runnable
             if (!executorRunning) {
                 executorRunning = true;
                 eventBus.getExecutorService().execute(this);
@@ -49,6 +54,7 @@ final class BackgroundPoster implements Runnable, Poster {
     public void run() {
         try {
             try {
+                // 循环从事件队列中取出事件，并使用EventBus中的invokeSubscriber方法处理事件，直到事件队列中的事件全部处理完毕
                 while (true) {
                     PendingPost pendingPost = queue.poll(1000);
                     if (pendingPost == null) {

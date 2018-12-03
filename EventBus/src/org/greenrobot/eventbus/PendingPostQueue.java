@@ -16,6 +16,14 @@
 
 package org.greenrobot.eventbus;
 
+/**
+ * 通过head和tail指针维护的一个PendingPost队列。
+ *
+ * HandlerPoster、BackgroundPoster和AsyncPoster中都有一个PendingPostQueue实例对象，通过这个PendingPostQueue对象来存储事件。
+ *
+ * enqueue()函数完成入队操作。
+ * poll()函数完成出队操作。
+ */
 final class PendingPostQueue {
     private PendingPost head;
     private PendingPost tail;

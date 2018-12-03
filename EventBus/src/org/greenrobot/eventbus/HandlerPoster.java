@@ -20,8 +20,15 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 
+/**
+ * 继承了Handler并且实现了Poster接口，与ThreadMode.Main相对应。
+ *
+ * 它的作用是将Event保存到内部封装的PendingPostQueue中，
+ * 不断地将队列中的事件发送到主线程的Looper，并在handleMessage()方法中处理事件。
+ */
 public class HandlerPoster extends Handler implements Poster {
 
+    /** 事件队列 **/
     private final PendingPostQueue queue;
     private final int maxMillisInsideHandleMessage;
     private final EventBus eventBus;
@@ -34,6 +41,7 @@ public class HandlerPoster extends Handler implements Poster {
         queue = new PendingPostQueue();
     }
 
+    /** 将 subscription和event 封装成PendingPost对象， 并加入到PendingPostQueue队列中 **/
     public void enqueue(Subscription subscription, Object event) {
         PendingPost pendingPost = PendingPost.obtainPendingPost(subscription, event);
         synchronized (this) {
@@ -49,10 +57,12 @@ public class HandlerPoster extends Handler implements Poster {
 
     @Override
     public void handleMessage(Message msg) {
+        // 处理事件
         boolean rescheduled = false;
         try {
             long started = SystemClock.uptimeMillis();
             while (true) {
+                // 死循环，不断从 队列中取 内容
                 PendingPost pendingPost = queue.poll();
                 if (pendingPost == null) {
                     synchronized (this) {
@@ -64,6 +74,7 @@ public class HandlerPoster extends Handler implements Poster {
                         }
                     }
                 }
+                // 通过EventBus的invokeSubscriber方法处理事件。
                 eventBus.invokeSubscriber(pendingPost);
                 long timeInMethod = SystemClock.uptimeMillis() - started;
                 if (timeInMethod >= maxMillisInsideHandleMessage) {

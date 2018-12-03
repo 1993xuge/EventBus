@@ -17,14 +17,21 @@ package org.greenrobot.eventbus;
 
 import java.lang.reflect.Method;
 
-/** Used internally by EventBus and generated subscriber indexes. */
+/**
+ * Used internally by EventBus and generated subscriber indexes.
+ *
+ * 订阅事件响应函数信息，
+ * 该类中包含了响应函数Method对象、处理事件的线程模型ThreadMode对象、事件对应的类型、优先级priority、是否接受粘性事件。
+ */
 public class SubscriberMethod {
     final Method method;
     final ThreadMode threadMode;
     final Class<?> eventType;
     final int priority;
     final boolean sticky;
-    /** Used for efficient comparison */
+    /**
+     * Used for efficient comparison
+     */
     String methodString;
 
     public SubscriberMethod(Method method, Class<?> eventType, ThreadMode threadMode, int priority, boolean sticky) {
@@ -41,7 +48,7 @@ public class SubscriberMethod {
             return true;
         } else if (other instanceof SubscriberMethod) {
             checkMethodString();
-            SubscriberMethod otherSubscriberMethod = (SubscriberMethod)other;
+            SubscriberMethod otherSubscriberMethod = (SubscriberMethod) other;
             otherSubscriberMethod.checkMethodString();
             // Don't use method.equals because of http://code.google.com/p/android/issues/detail?id=7811#c6
             return methodString.equals(otherSubscriberMethod.methodString);

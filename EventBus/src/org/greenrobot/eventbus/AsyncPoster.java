@@ -18,6 +18,10 @@ package org.greenrobot.eventbus;
 
 /**
  * Posts events in background.
+ * 同时实现了Runnable接口和Poster接口，与ThreadMode.ASYNC相对应。
+ *
+ * 它的作用是 通过enqueue()函数将事件保存到内部封装的PendingPostQueue队列中，
+ * 并调用线程池执行该任务，在run()方法中将事件取出，并执行回调。
  * 
  * @author Markus
  */
@@ -32,7 +36,9 @@ class AsyncPoster implements Runnable, Poster {
     }
 
     public void enqueue(Subscription subscription, Object event) {
+        // 把 事件和Subscription对象 封装成 PendingPost
         PendingPost pendingPost = PendingPost.obtainPendingPost(subscription, event);
+        // 将 生成的 pendingPost对象 加入到队列中
         queue.enqueue(pendingPost);
         eventBus.getExecutorService().execute(this);
     }
@@ -43,6 +49,7 @@ class AsyncPoster implements Runnable, Poster {
         if(pendingPost == null) {
             throw new IllegalStateException("No pending post available");
         }
+        // 从队列中取出 PendingPost对象
         eventBus.invokeSubscriber(pendingPost);
     }
 

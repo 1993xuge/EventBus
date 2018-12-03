@@ -17,7 +17,7 @@ package org.greenrobot.eventbus;
 
 /**
  * Posts events.
- *
+ * 定义了enqueue()方法，其作用是将事件添加到队列中，但具体事件如何发送处理，由实现类根据自己的需求完成。
  * @author William Ferguson
  */
 interface Poster {

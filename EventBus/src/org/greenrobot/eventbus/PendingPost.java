@@ -18,6 +18,13 @@ package org.greenrobot.eventbus;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 将事件对象和订阅方法信息Subscription对象封装在一起，并含有同一队列中指向下一个对象的指针
+ *
+ * 该类的实例对象一般用在PendingPostQueue队列中。
+ *
+ * 该类中还通过缓存存储不用的对象，减少下次创建的性能消耗。
+ */
 final class PendingPost {
     private final static List<PendingPost> pendingPostPool = new ArrayList<PendingPost>();
 
